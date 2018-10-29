@@ -1,5 +1,7 @@
 import click
 import itertools
+import re
+import in_place
 
 @click.group()
 def word_cli():
@@ -40,7 +42,6 @@ def reverse(input):
 @word_cli.command()
 @click.argument('file1', type=click.Path(exists=True), required=1)
 @click.argument('file2', type=click.Path(exists=True), required=1)
-
 def merge(file1, file2):
     '''merge two files according to heuristics by Lioz. I assume that separating text file contents by white space
     is legit.'''
@@ -86,8 +87,31 @@ def __get_pair_from_file(file_path):
     if counter == 1:
         yield so_called_pair
 
+@word_cli.command()
+@click.argument("io_file", type=click.Path(exists=True), required=1)
+@click.argument("dict_file", type=click.Path(exists=True), required=1)
+def sub_by_dict(io_file, dict_file):
+    '''
+    replace input file contents by using a dictionary file
+    :param input_file:
+    :param dict_file:
+    :return:
+    '''
+    dict = __parse_dict_file(dict_file)
+    sorted_keys = sorted(dict.keys(), key=len, reverse=True)
+    with in_place.InPlace(io_file) as io:
+        for line in io:
+            for key in sorted_keys:
+                line = re.sub(key, dict[key], line)
+            io.writelines(line)
 
-
+def __parse_dict_file(dict_file):
+    dict = {}
+    with open(dict_file, "r") as input:
+        for line in input.readlines():
+            k, v = line.split()
+            dict[k] = v
+    return dict
 
 if __name__ == '__main__':
     word_cli()
