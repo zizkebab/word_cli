@@ -11,9 +11,8 @@ def word_cli():
 #     click.echo('divide a file into to files: one with odds and one with evens')
 
 @word_cli.command()
-# @click.command()
 @click.argument('input', type=click.STRING, required=1)
-def reverse():
+def reverse(input):
     '''reverse a given string'''
 
     ''' builtin extended slicing to reverse'''
