@@ -6,7 +6,7 @@ def word_cli():
 
 
 @word_cli.command()
-@click.argument('f', type=click.Path(exists=True))
+@click.argument('f', type=click.Path(exists=True), required=1)
 def divide(f):
     '''divide a file into to files: one with odds and one with evens'''
     click.echo("Dividing {0} into {0}_odd and {0}_even".format(f))
@@ -36,11 +36,52 @@ def reverse(input):
     reversed = input[::-1]
     click.echo(reversed)
 
-# @word_cli.command()
-# def merge():
-#     '''merge two files according to heuristics by Lioz'''
-#     click.echo('merge two files according to heuristics by Lioz')
-#
+@word_cli.command()
+@click.argument('file1', type=click.Path(exists=True), required=1)
+@click.argument('file2', type=click.Path(exists=True), required=1)
+
+def merge(file1, file2):
+    '''merge two files according to heuristics by Lioz. I assume that separating text file contents by white space
+    is legit.'''
+    output_path = "{0}_{1}".format(file1, file2)
+    click.echo('merge {0} and {1} into {2} according to heuristics by Lioz'.format(file1, file2, output_path))
+    with open(output_path, "w") as output_merge:
+        for word, pair in zip(__get_word_from_file(file1), __get_pair_from_file(file2)):
+            output_merge.writelines("{0} {1} ".format(word,pair))
+
+
+def __get_word_from_file(file_path):
+    '''
+    opens a file, splits to string by white space, and generates a string iterator
+    :param file_path: text file source path
+    :return:
+    '''
+    with open(file_path, "r") as input:
+        for word in input.read().split():
+            yield word
+
+
+def __get_pair_from_file(file_path):
+    '''
+    opens a file, splits to string by white space, and generates a string iterator of word pairs
+    :param file_path: text file source path
+    :return:
+    '''
+    so_called_pair = ""
+    counter = 0
+    with open(file_path, "r") as input:
+        for word in input.read().split():
+            counter += 1
+            if counter == 2:
+                so_called_pair = " ".join((so_called_pair, word))
+                counter = 0
+                yield so_called_pair
+            else:
+                so_called_pair = word
+
+    if counter == 1:
+        yield so_called_pair
+
 
 if __name__ == '__main__':
     word_cli()
