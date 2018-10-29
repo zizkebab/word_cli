@@ -1,4 +1,5 @@
 import click
+import itertools
 
 @click.group()
 def word_cli():
@@ -46,7 +47,10 @@ def merge(file1, file2):
     output_path = "{0}_{1}".format(file1, file2)
     click.echo('merge {0} and {1} into {2} according to heuristics by Lioz'.format(file1, file2, output_path))
     with open(output_path, "w") as output_merge:
-        for word, pair in zip(__get_word_from_file(file1), __get_pair_from_file(file2)):
+
+        # afaik zip_longest is something nice and new in python 3. In python2, I should've made something like
+        # this: https://flylib.com/books/en/2.9.1.361/1/
+        for word, pair in itertools.zip_longest(__get_word_from_file(file1), __get_pair_from_file(file2)):
             output_merge.writelines("{0} {1} ".format(word,pair))
 
 
@@ -81,6 +85,8 @@ def __get_pair_from_file(file_path):
 
     if counter == 1:
         yield so_called_pair
+
+
 
 
 if __name__ == '__main__':
