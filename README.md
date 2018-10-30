@@ -14,7 +14,13 @@ Run the application:
 $ python -m word_cli --help
 ```
 
-To run the tests:
+CLI verbosity level can be set with --verbosity=level:
+```
+$ python -m word_cli reverse foobar --verbosity=debug
+```
+
+
+To run the tests (to be added...):
 ```
     $ pytest
 ```
